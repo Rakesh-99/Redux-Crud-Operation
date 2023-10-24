@@ -1,14 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { useSelector } from 'react-redux';
 
 
 
+
+// Get User : 
 export const getUser = createAsyncThunk('getUser', async () => {
+    // console.log(data);
 
-    const get = await fetch('https://653390f2d80bd20280f695d8.mockapi.io/crud')
+    const get = await fetch('https://653390f2d80bd20280f695d8.mockapi.io/crud', {
+
+        method: 'GET',
+    })
     const response = await get.json();
     return response
 });
 
+// Create User : 
 export const createUser = createAsyncThunk('createUser', async (data, { rejectWithValue }) => {
 
     const create = await fetch('https://653390f2d80bd20280f695d8.mockapi.io/crud', {
@@ -23,6 +31,18 @@ export const createUser = createAsyncThunk('createUser', async (data, { rejectWi
     return response;
 
 });
+
+// Delete User : 
+export const deleteUser = createAsyncThunk('deleteUser', async (id) => {
+    const deleteUserById = await fetch(`https://653390f2d80bd20280f695d8.mockapi.io/crud/${id}`, {
+        method: 'DELETE',
+
+    })
+    const response = await deleteUserById.json();
+    return response;
+});
+
+
 
 const userSlice = createSlice({
 
@@ -60,6 +80,18 @@ const userSlice = createSlice({
         [createUser.rejected]: (state, action) => {
             state.loading = false;
             state.error = action.payload.message;
+        },
+        [deleteUser.pending]: (state) => {
+            state.loading = true;
+        },
+        [deleteUser.fulfilled]: (state, action) => {
+            state.loading = false;
+            state.user = () => { }
+
+        },
+        [deleteUser.rejected]: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
         }
     }
 

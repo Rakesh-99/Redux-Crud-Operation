@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CreateUser from './pages/CreateUser';
 import EditUser from './pages/EditUser';
+import NavBar from './components/NavBar';
 
 
 
@@ -15,6 +16,7 @@ const App = () => {
         <>
             <Provider store={store}>
                 <BrowserRouter>
+                    <NavBar />
                     <Routes>
                         <Route path='/' element={<Home />} />
                         <Route path='/create' element={<CreateUser />} />
