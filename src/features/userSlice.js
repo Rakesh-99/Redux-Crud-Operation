@@ -1,100 +1,138 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { useSelector } from 'react-redux';
 
 
 
 
-// Get User : 
-export const getUser = createAsyncThunk('getUser', async () => {
-    // console.log(data);
+// Get User :
+export const getAllUser = createAsyncThunk('getAllUser', async () => {
 
-    const get = await fetch('https://653390f2d80bd20280f695d8.mockapi.io/crud', {
-
-        method: 'GET',
-    })
-    const response = await get.json();
-    return response
-});
-
-// Create User : 
-export const createUser = createAsyncThunk('createUser', async (data, { rejectWithValue }) => {
-
-    const create = await fetch('https://653390f2d80bd20280f695d8.mockapi.io/crud', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-    const response = await create.json();
-    return response;
+    try {
+        const getUser = await fetch('https://653390f2d80bd20280f695d8.mockapi.io/crud', {
+            method: 'GET'
+        });
+        const response = await getUser.json();
+        return response;
+    } catch (error) {
+        return error;
+    }
 
 });
+// Add User 
+export const addUser = createAsyncThunk('addUser', async (data, { rejectWithValue }) => {
 
-// Delete User : 
-export const deleteUser = createAsyncThunk('deleteUser', async (id) => {
-    const deleteUserById = await fetch(`https://653390f2d80bd20280f695d8.mockapi.io/crud/${id}`, {
-        method: 'DELETE',
+    try {
+        const addUserData = await fetch(`https://653390f2d80bd20280f695d8.mockapi.io/crud`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        const response = await addUserData.json();
+        return response;
+    } catch (error) {
+        return rejectWithValue(error);
+    }
+});
 
-    })
-    const response = await deleteUserById.json();
-    return response;
+// Delete User :
+
+export const deleteUser = createAsyncThunk('deleteUser', async (id, { rejectWithValue }) => {
+
+    try {
+        const deleteUserData = await fetch(`https://653390f2d80bd20280f695d8.mockapi.io/crud/${id}`, {
+            method: 'DELETE'
+        })
+        const response = await deleteUserData.json();
+        return response;
+    } catch (error) {
+        return rejectWithValue(error);
+    }
+});
+
+export const updateUser = createAsyncThunk('updateUser', async (data, { rejectWithValue }) => {
+
+    try {
+        const updateUserData = await fetch(`https://653390f2d80bd20280f695d8.mockapi.io/crud/${data.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        const response = await updateUserData.json();
+        return response;
+    } catch (error) {
+        return rejectWithValue(error);
+    }
 });
 
 
 
 const userSlice = createSlice({
 
-    name: 'crud_app',
-
+    name: 'app',
     initialState: {
         loading: false,
         users: [],
         error: null
     },
+    reducers: {
 
-    reducers: {},
-
+    },
     extraReducers: {
-
-        [getUser.pending]: (state) => {
+        [getAllUser.pending]: (state) => {
             state.loading = true
         },
-        [getUser.fulfilled]: (state, action) => {
+        [getAllUser.fulfilled]: (state, action) => {
             state.loading = false;
-            state.users = action.payload
+            state.users = action.payload;
         },
-        [getUser.rejected]: (state, action) => {
+        [getAllUser.rejected]: (state, action) => {
             state.loading = false;
-            state.error = action.payload
+            state.error = action.payload;
         },
-        [createUser.pending]: (state) => {
-            state.loading = true;
+        [addUser.pending]: (state) => {
+            state.loading = true
         },
-        [createUser.fulfilled]: (state, action) => {
+        [addUser.fulfilled]: (state, action) => {
             state.loading = false;
             state.users.push(action.payload);
-
         },
-        [createUser.rejected]: (state, action) => {
+        [addUser.rejected]: (state, action) => {
             state.loading = false;
-            state.error = action.payload.message;
+            state.error = action.payload;
         },
         [deleteUser.pending]: (state) => {
-            state.loading = true;
+            state.loading = true
         },
         [deleteUser.fulfilled]: (state, action) => {
             state.loading = false;
-            state.user = () => { }
-
+            state.users = state.users.filter((ele) => {
+                return ele.id !== action.payload.id;
+            })
         },
         [deleteUser.rejected]: (state, action) => {
             state.loading = false;
-            state.error = action.payload;
+            state.error = action.payload.message;
+        },
+
+        [updateUser.pending]: (state) => {
+            state.loading = true
+        },
+        [updateUser.fulfilled]: (state, action) => {
+            state.loading = false;
+            state.users = state.users.map((ele) => ele.id === action.payload.id ? action.payload : ele);
+
+
+        },
+        [updateUser.rejected]: (state, action) => {
+            state.loading = false;
+            state.error = action.payload.message;
         }
     }
-
 });
 
 export default userSlice.reducer;
